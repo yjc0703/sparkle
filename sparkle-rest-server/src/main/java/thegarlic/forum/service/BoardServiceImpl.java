@@ -5,12 +5,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -128,25 +124,16 @@ public class BoardServiceImpl extends BaseServiceImpl {
     }
     
     private ModelMapper createMapper() {
-        
-        ModelMapper mapper = new ModelMapper();
-        
-        mapper.addConverter(new Converter<DateTime, String>() {
-            @Override
-            public String convert(MappingContext<DateTime, String> context) {
-                return context.getSource() == null ? "" : context.getSource().withZone(DateTimeZone.UTC).toString();
-            }
-        });
-        
-        return mapper;
+        return ModelMapperBuilder.modelMapper()
+                .withDateTimeToUTCString()
+                .build();
     }
     
     private ModelMapper createMapper(PropertyMap<?, ?> map) {
-        
-        ModelMapper mapper = createMapper();
-        mapper.addMappings(map);
-        
-        return mapper;
+        return ModelMapperBuilder.modelMapper()
+                .withDateTimeToUTCString()
+                .withMapping(map)
+                .build();
     }
     
     
